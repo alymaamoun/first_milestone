@@ -1,0 +1,29 @@
+void microDelay (int n)
+    {int c, d;
+       for (c = 1; c <= n; c++) {
+           for (d = 1; d <= 3180; d++){
+                 }
+             }
+    }
+
+void milliDelay (int n)
+    {int c, d;
+       for (c = 1; c <= n; c++) {
+           for (d = 1; d <= 3; d++){
+                 }
+             }
+    }
+
+void lcdInit(void)
+{
+    LCD_Command(0x01);
+    microDelay(50);
+    LCD_Command (0x38);  //work on 8 bits lcd
+    microDelay(50);
+    LCD_Command (0x0F);  //display on, cursor on
+    microDelay(50);
+    LCD_Command (0x06);  //wakeup
+    microDelay(50);
+    LCD_Command (0x01);  //clear display screen
+    milliDelay(5);  //shifting cursor to the right
+}
