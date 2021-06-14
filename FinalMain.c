@@ -81,6 +81,12 @@ char *protocolValues[];
 
 void GPS_Read(){
     int i,j;
+    //cleaning the array before using
+    for(i=0;i<17;i++){
+        for(j=0;j<999;j++){
+            array_Data[i][j]='0';
+        }
+    }
     while((UART2_FR_R &0x10) !=0);
     data= (UART2_DR_R&0xFF);
 
