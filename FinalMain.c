@@ -11,6 +11,17 @@
 #define degToRadian (3.1415926536 / 180)
 void SystemInit(){}
 
+char *protocolValues[];
+char *token;
+const char comma[2] = ",";
+float UTC_Time;
+float currentLongitude=0;
+float currentLatitude=0;
+int distance;
+float newLatitude;
+float newLongitude;
+char array_Data[18][1000];
+char data='0';
 
 
 void swap(char *x, char *y) {
@@ -183,32 +194,14 @@ void lcdInit(void)
     milliDelay(5);  //shifting cursor to the right
 }
 
-/*void lcdPrintString(unsigned char[] ){
-    int i;
-    for(i=0;str[i]!='\0';i++){
-        LCD_Data(str[i]);
-    }
-}*/
 
-void checkDistance(int distance){
+
+void checkDistance(){
     if(distance>100){
        GPIO_PORTF_DATA_R=0x0E;
     }
 }
 
-     char *protocolValues[];
-     const char comma[2] = ",";
-     float UTC_Time;
-     float currentLongitude=0;
-     float currentAltitude=0;
-     float currentLatitude=0;
-     int distancePath;
-     int distanceSaved;
-     float newLatitude;
-     float newLongitude;
-     float newAltitude;
-	 char array_Data[18][1000];
-	 char data='0';
 
 
      //function to take values from parsed string and do math ops on them and them place them in the next coordinates
@@ -257,7 +250,7 @@ void addDistance(){
 
     float b=2*atan2(sqrt(a),sqrt(1-a));
 
-    distancePath=distancePath+b*earthRadius;
+    distance=distance+b*earthRadius;
 
 
 
@@ -269,43 +262,47 @@ void addDistance(){
 }
 
 void GPS_Read(){
-	int i,j;
+    int i,j;
     while((UART2_FR_R &0x10) !=0);
     data= (UART2_DR_R&0xFF);
-	
-	for(i=0;i<17;i++){
-		for(j=0;array_Data[i][j]!='\0';j++){
-			array_Data[i]=(UART2_DR_R&0xFF);
+
+    for(i=0;i<17;i++){
+        for(j=0;array_Data[i][j]!='\0';j++){
+            array_Data[i][j]=(UART2_DR_R&0xFF);
+
+        }
+    }
 }
-	}
-
 void parse(){
-    int i,;
+    int i;
     for(i=0;array_Data[i]!='\0';i++){
-
         int counter=i;
-        if(array_Date[i][counter]=='$'){
+        if(array_Data[i][counter]=='$'){
             counter++;
-            if(array_Date[i][counter]=='G'){
+            if(array_Data[i][counter]=='G'){
                 counter++;
 
-                if(array_Date[i][counter]=='P'){
+                if(array_Data[i][counter]=='P'){
                     counter++;
 
-                    if(array_Date[i][counter]=='R'){
+                    if(array_Data[i][counter]=='R'){
                         counter++;
 
-                        if(array_Date[i][counter]=='M'){
+                        if(array_Data[i][counter]=='M'){
                             counter++;
-                            if(array_Date[i][counter]=='C'){
-                                counter+=2;
-                                int index = 0;
-                                char *token=strtok(array_Data[i],comma);
+                            if(array_Data[i][counter]=='C'){
+                                counter=counter+2;
+
+
+                                token=strtok(array_Data[i],comma);
                                 while( token != NULL ) {
+                                    int index = 0;
+
                                     strcpy(protocolValues[index], token);
                                     token = strtok(NULL,comma);
                                     index++;
-                               }
+
+                                }
                                 }
                             }
                         }
@@ -313,7 +310,7 @@ void parse(){
                 }
             }
         }
-    }
+}
 
 
 
@@ -322,14 +319,13 @@ int main(){
     lcdInit();
 
     while(1){
-		GPS_Read();
-		parse();
-		if(GPIO_PORTF_DATA_R&&0x01){
-		location_initlialize();
-		}
-	Coordinate_Adjustment();
-	addDistance();
-	checkDistance();
+        GPS_Read();
+        parse();
+        if(GPIO_PORTF_DATA_R&&0x01){
+        location_initlialize();
+        }
+    addDistance();
+    checkDistance();
 
         LCD_Data(distance);
       }
