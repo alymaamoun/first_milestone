@@ -87,11 +87,12 @@ void GPS_Read(){
             array_Data[i][j]='0';
         }
     }
-    while((UART2_FR_R &0x10) !=0);
-    data= (UART2_DR_R&0xFF);
+    /*while((UART2_FR_R &0x10) !=0);
+    data= (UART2_DR_R&0xFF);*/
 
     for(i=0;i<17;i++){
         for(j=0;array_Data[i][j]!='\0';j++){
+            while((UART2_FR_R &0x10) !=0);
             array_Data[i][j]=(UART2_DR_R&0xFF);
 }
     }
